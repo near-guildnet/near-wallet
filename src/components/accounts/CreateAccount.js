@@ -16,18 +16,6 @@ class CreateAccount extends Component {
         recaptchaFallback: false
     }
 
-    componentDidMount = () => {
-        const { loginError, resetAccounts } = this.props;
-
-        if (loginError) {
-            console.error('Error loading account:', loginError)
-
-            if (loginError.indexOf('does not exist while viewing') !== -1) {
-                resetAccounts()
-            }
-        }
-    }
-
     componentWillUnmount = () => {
         this.props.clear()
     }
@@ -83,7 +71,6 @@ class CreateAccount extends Component {
                 location={this.props.location}
                 title={<Translate id='createAccount.pageTitle' />}
                 text={<Translate id='createAccount.pageText' />}
-                loginResetAccounts={loginResetAccounts}
             >
                 <AccountFormSection 
                     handleSubmit={this.handleCreateAccount}
