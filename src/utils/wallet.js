@@ -137,7 +137,10 @@ class Wallet {
                 const accountIdNotConfirmed = !getAccountConfirmed(accountId, NETWORK_ID)
                 
                 this.clearAccountState()
-                this.selectAccount(Object.keys(this.accounts)[0])
+                const nextAccountId = Object.keys(this.accounts).find((account) => (
+                    getAccountConfirmed(account, NETWORK_ID)
+                )) || Object.keys(this.accounts)[0]
+                this.selectAccount(nextAccountId)
 
                 return {
                     loginResetAccount: true,
