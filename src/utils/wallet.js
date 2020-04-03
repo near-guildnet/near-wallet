@@ -125,17 +125,25 @@ class Wallet {
 
     async refreshAccount() {
         try {
-            return await this.loadAccount()
+            const account = await this.loadAccount()
+            localStorage.setItem(`wallet.account:${this.accountId}:${NETWORK_ID}:confirmed`, true)
+            return account
         } catch (error) {
             console.error('Error loading account:', error)
 
             if (error.toString().indexOf('does not exist while viewing') !== -1) {
+                const accountId = this.accountId
+                const accountIdConfirmed = localStorage.getItem(`wallet.account:${accountId}:${NETWORK_ID}:confirmed`) === 'false'
+                
                 this.clearAccountState()
                 this.selectAccount(Object.keys(this.accounts)[0])
+
                 return {
                     loginResetAccount: true,
-                    globalAlertPreventClear: this.isEmpty(),
-                    ...(!this.isEmpty() && await this.loadAccount())
+                    loginResetAccountPreventClear: accountIdConfirmed,
+                    loginResetAccountNotConfirmed: accountId,
+                    globalAlertPreventClear: accountIdConfirmed || this.isEmpty(),
+                    ...(!this.isEmpty() && !accountIdConfirmed && await this.loadAccount())
                 }
             }
 
@@ -252,6 +260,7 @@ class Wallet {
         await this.keyStore.setKey(NETWORK_ID, accountId, keyPair)
         this.accounts[accountId] = true
         this.accountId = accountId
+        localStorage.setItem(`wallet.account:${this.accountId}:${NETWORK_ID}:confirmed`, false)
         this.save()
     }
 
@@ -292,6 +301,7 @@ class Wallet {
 
     clearAccountState() {
         delete this.accounts[this.accountId]
+        localStorage.removeItem(`wallet.account:${this.accountId}:${NETWORK_ID}:confirmed`)
         this.accountId = ''
         this.save()
     }
