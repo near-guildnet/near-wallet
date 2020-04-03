@@ -7,6 +7,7 @@ import { KeyType } from 'near-api-js/lib/utils/key_pair'
 import { store } from '..'
 import { getAccessKeys } from '../actions/account'
 import { generateSeedPhrase } from 'near-seed-phrase';
+import { setAccountConfirmed, getAccountConfirmed, removeAccountConfirmed} from './localStorage'
 
 export const WALLET_CREATE_NEW_ACCOUNT_URL = 'create'
 export const WALLET_CREATE_NEW_ACCOUNT_FLOW_URLS = ['create', 'set-recovery', 'setup-seed-phrase', 'recover-account', 'recover-seed-phrase']
@@ -126,24 +127,24 @@ class Wallet {
     async refreshAccount() {
         try {
             const account = await this.loadAccount()
-            localStorage.setItem(`wallet.account:${this.accountId}:${NETWORK_ID}:confirmed`, true)
+            setAccountConfirmed(this.accountId, NETWORK_ID, true)
             return account
         } catch (error) {
             console.error('Error loading account:', error)
 
             if (error.toString().indexOf('does not exist while viewing') !== -1) {
                 const accountId = this.accountId
-                const accountIdConfirmed = localStorage.getItem(`wallet.account:${accountId}:${NETWORK_ID}:confirmed`) === 'false'
+                const accountIdNotConfirmed = !getAccountConfirmed(accountId, NETWORK_ID)
                 
                 this.clearAccountState()
                 this.selectAccount(Object.keys(this.accounts)[0])
 
                 return {
                     loginResetAccount: true,
-                    loginResetAccountPreventClear: accountIdConfirmed,
+                    loginResetAccountPreventClear: accountIdNotConfirmed,
                     loginResetAccountNotConfirmed: accountId,
-                    globalAlertPreventClear: accountIdConfirmed || this.isEmpty(),
-                    ...(!this.isEmpty() && !accountIdConfirmed && await this.loadAccount())
+                    globalAlertPreventClear: accountIdNotConfirmed || this.isEmpty(),
+                    ...(!this.isEmpty() && !accountIdNotConfirmed && await this.loadAccount())
                 }
             }
 
@@ -260,7 +261,7 @@ class Wallet {
         await this.keyStore.setKey(NETWORK_ID, accountId, keyPair)
         this.accounts[accountId] = true
         this.accountId = accountId
-        localStorage.setItem(`wallet.account:${this.accountId}:${NETWORK_ID}:confirmed`, false)
+        setAccountConfirmed(this.accountId, NETWORK_ID, false)
         this.save()
     }
 
@@ -301,7 +302,7 @@ class Wallet {
 
     clearAccountState() {
         delete this.accounts[this.accountId]
-        localStorage.removeItem(`wallet.account:${this.accountId}:${NETWORK_ID}:confirmed`)
+        removeAccountConfirmed(this.accountId, NETWORK_ID)
         this.accountId = ''
         this.save()
     }
