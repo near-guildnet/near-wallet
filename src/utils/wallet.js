@@ -303,12 +303,6 @@ class Wallet {
         return [(await this.keyStore.getKey(NETWORK_ID, this.accountId)).publicKey]
     }
 
-    clearState() {
-        this.accounts = {}
-        this.accountId = ''
-        this.save()
-    }
-
     clearAccountState() {
         delete this.accounts[this.accountId]
         removeAccountConfirmed(this.accountId, NETWORK_ID)
