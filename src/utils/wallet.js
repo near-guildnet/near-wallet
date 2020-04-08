@@ -271,8 +271,8 @@ class Wallet {
         await this.keyStore.setKey(NETWORK_ID, accountId, keyPair)
         this.accounts[accountId] = true
         this.accountId = accountId
-        setAccountConfirmed(this.accountId, false)
         this.save()
+        setAccountConfirmed(this.accountId, false)
     }
 
     async addAccessKey(accountId, contractId, publicKey) {
