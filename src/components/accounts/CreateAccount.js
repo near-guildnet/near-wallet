@@ -11,7 +11,7 @@ import { ACCOUNT_ID_SUFFIX } from '../../utils/wallet'
 class CreateAccount extends Component {
     state = {
         loader: false,
-        accountId: (this.props.resetAccount && this.props.resetAccount.accountIdNotConfirmed) || '',
+        accountId: '',
         token: '',
         recaptchaFallback: false
     }
@@ -65,7 +65,7 @@ class CreateAccount extends Component {
         const { loader, accountId, recaptchaFallback } = this.state
         const { requestStatus, formLoader, checkNewAccount, location, resetAccount, clear, setFormLoader } = this.props
         const useRequestStatus = accountId.length > 0 ? requestStatus : undefined;
-
+        
         return (
             <AccountFormContainer
                 location={this.props.location}
