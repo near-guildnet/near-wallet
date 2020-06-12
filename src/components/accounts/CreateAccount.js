@@ -40,7 +40,7 @@ class CreateAccount extends Component {
         }
     }
 
-    handleCreateAccount = () => {
+    handleCreateAccount = async () => {
         const { accountId, token } = this.state;
         const { match, createNewAccount, setFormLoader } = this.props
 
@@ -48,21 +48,18 @@ class CreateAccount extends Component {
         const fundingContract = match.params.fundingContract;
 
         this.setState({ loader: true });
-        
-        createNewAccount(accountId, fundingKey, fundingContract, token)
-            .then(({ error, payload }) => {
-                if (error) {
-                    if (payload.statusCode === 402) {
-                        this.setState({ recaptchaFallback: true });
-                    }
-                    this.setState({ loader: false });
-                    return;
-                }
-
-                this.handleCreateAccountSuccess();
-            });
+        try {
+            await createNewAccount(accountId, fundingKey, fundingContract, token)
+        } catch (error) {
+            if (error.statusCode === 402) {
+                this.setState({ recaptchaFallback: true });
+            }
+        } finally {
+            this.setState({ loader: false });
+        }
         
         setFormLoader(false)
+        this.handleCreateAccountSuccess();
     }
 
     handleCreateAccountSuccess = () => {
