@@ -93,35 +93,30 @@ class RecoveryContainer extends Component {
         history.push(`${method !== 'phrase' ? '/set-recovery/' : '/setup-seed-phrase/'}${accountId}`);
     }
 
-    handleDeleteMethod = (method) => {
+    handleDeleteMethod = async (method) => {
         const { deleteRecoveryMethod, loadRecoveryMethods } = this.props;
 
         this.setState({ deletingMethod: method.detail })
-        deleteRecoveryMethod(method)
-            .then(({ error }) => {
-                if (error) {
-                    this.setState({ deletingMethod: '' });
-                }
-                loadRecoveryMethods();
-                this.setState({ deletingMethod: '' });
-        })
+        try {
+            await deleteRecoveryMethod(method)
+            await loadRecoveryMethods();
+        } finally {
+            this.setState({ deletingMethod: '' });
+        }
     }
 
-    handleResendLink = (method) => {
+    handleResendLink = async (method) => {
         const { sendNewRecoveryLink, loadRecoveryMethods } = this.props;
         
         this.setState({ resendingLink: method.detail })
-        sendNewRecoveryLink(method)
-            .then(({ error }) => {
-                if (error) return
 
-                loadRecoveryMethods();
-                this.setState({ successSnackbar: true, resendingLink: '' }, () => {
-                    setTimeout(() => {
-                        this.setState({successSnackbar: false});
-                    }, snackbarDuration)
-                });
-            })
+        await sendNewRecoveryLink(method)
+        await loadRecoveryMethods();
+        this.setState({ successSnackbar: true, resendingLink: '' }, () => {
+            setTimeout(() => {
+                this.setState({successSnackbar: false});
+            }, snackbarDuration)
+        });
     }
  
     render() {

@@ -33,17 +33,15 @@ class RecoverAccountSeedPhrase extends Component {
         this.props.clear()
     }
 
-    handleSubmit = () => {
+    handleSubmit = async () => {
         if (!this.isLegit) {
             return false
         }
 
-        this.props.recoverAccountSeedPhrase(this.state.seedPhrase)
-            .then(({ error }) => {
-                if (error) return
-                this.props.refreshAccount()
-                this.props.redirectToApp()
-            })
+        const { accountId, seedPhrase } = this.state
+        await this.props.recoverAccountSeedPhrase(seedPhrase, accountId)
+        this.props.refreshAccount()
+        this.props.redirectToApp()
     }
 
     isSeedPhraseValid = () => !(this.props.requestStatus.errorMessage && this.props.requestStatus.errorMessage.includes('Cannot find matching public key'))
