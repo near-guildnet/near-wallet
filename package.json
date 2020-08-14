@@ -38,7 +38,7 @@
     "predeploy": "yarn build",
     "deploy": "gh-pages -d dist/",
     "update:static": "cp src/wasm/multisig.wasm dist/multisig.wasm",
-    "start": "REACT_APP_ACCOUNT_ID_SUFFIX=guildnet REACT_APP_ACCOUNT_HELPER_URL=https://helper.openshards.io EXPLORER_URL=https://explorer.openshards.io REACT_APP_NODE_URL=https://rpc.openshards.io update:static; parcel src/index.html",
+    "start": "yarn update:static; REACT_APP_ACCOUNT_ID_SUFFIX=guildnet REACT_APP_ACCOUNT_HELPER_URL=https://helper.openshards.io EXPLORER_URL=https://explorer.openshards.io REACT_APP_NODE_URL=https://rpc.openshards.io parcel src/index.html",
     "prebuild": "rm -rf dist/",
     "build": "parcel build src/index.html && node scripts/sentry-send-release.js && yarn update:static",
     "test": "jest",
